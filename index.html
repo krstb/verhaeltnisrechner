@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verhältnis-Rechner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Als Standardschriftart Inter verwenden */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Benutzerdefinierte Stile für die Input-Number-Spinner */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Einheitlicher Stil für die Segment-Steuerelemente */
+        .segmented-control button {
+            transition: all 0.2s ease-in-out;
+        }
+        .segmented-control button.active {
+            background-color: #3B82F6;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 md:p-5">
+
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-5">
+        
+        <div class="text-center mb-3">
+            <h1 class="text-xl font-bold text-gray-800">Verhältnis-Rechner</h1>
+            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und mehr.</p>
+        </div>
+        
+        <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Art der Eingabe
+            </label>
+            <div id="ratio-mode-selector" class="segmented-control flex w-full rounded-lg bg-gray-200 p-0.5">
+                <button id="ratio-mode-ratio-btn" class="w-1/2 py-1.5 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                    Verhältnis (1:n)
+                </button>
+                <button id="ratio-mode-percent-btn" class="w-1/2 py-1.5 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                    Prozent (%)
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Verhältnis / Maßstab
+                </label>
+                <div id="ratio-inputs" class="flex items-center space-x-2">
+                    <input type="number" id="ratio1" placeholder="Teile 1" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="1" min="0">
+                    <span class="text-lg font-bold text-gray-400">:</span>
+                    <input type="number" id="ratio2" placeholder="Teile 2" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="2" min="0">
+                </div>
+                <div id="percent-inputs" class="hidden">
+                    <input type="number" id="percent-value" placeholder="Anteil 1 in %" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="50" min="0" max="100">
+                </div>
+            </div>
+
+            <div class="segmented-control flex w-full rounded-lg bg-gray-200 p-0.5">
+                <button id="tab-total" class="w-1/2 py-1.5 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                    Nach Gesamtmenge
+                </button>
+                <button id="tab-single" class="w-1/2 py-1.5 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                    Nach Einzelmenge
+                </button>
+            </div>
+
+            <div id="tab-panels" class="space-y-3">
+                <div id="panel-total">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label id="label-totalAmount" for="totalAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                Gesamtmenge
+                            </label>
+                            <input type="number" id="totalAmount" placeholder="z.B. 1000" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                        </div>
+                        <div>
+                            <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">
+                                Einheit
+                            </label>
+                            <select id="unit" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option selected>g</option>
+                                <option>kg</option>
+                                <option>ml</option>
+                                <option>l</option>
+                                <option>mm</option>
+                                <option>cm</option>
+                                <option>dm</option>
+                                <option>m</option>
+                                <option>km</option>
+                                <option>Pixel</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-single" class="hidden">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label id="label-amount1" for="amount1" class="block text-sm font-medium text-gray-700 mb-1">
+                                Menge Teil 1
+                            </label>
+                            <input type="number" id="amount1" placeholder="Wert eingeben" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                        </div>
+                        <div>
+                            <label id="label-amount2" for="amount2" class="block text-sm font-medium text-gray-700 mb-1">
+                                Menge Teil 2
+                            </label>
+                            <input type="number" id="amount2" placeholder="Wert eingeben" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                        </div>
+                        <div>
+                            <label for="unit-single" class="block text-sm font-medium text-gray-700 mb-1">
+                                Einheit
+                            </label>
+                            <select id="unit-single" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option selected>g</option>
+                                <option>kg</option>
+                                <option>ml</option>
+                                <option>l</option>
+                                <option>mm</option>
+                                <option>cm</option>
+                                <option>dm</option>
+                                <option>m</option>
+                                <option>km</option>
+                                <option>Pixel</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="text-red-500 text-center text-sm mt-3 font-medium hidden"></div>
+        
+        <div id="results-container" class="mt-4 pt-4 border-t border-gray-200 hidden">
+            <h2 class="text-base font-semibold text-center text-gray-800 mb-3">Ergebnis</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <div class="bg-blue-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result1-label" class="font-medium text-sm text-blue-800">Menge Teil 1:</span>
+                    <span id="result1" class="text-sm font-bold text-blue-900"></span>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result2-label" class="font-medium text-sm text-green-800">Menge Teil 2:</span>
+                    <span id="result2" class="text-sm font-bold text-green-900"></span>
+                </div>
+                <div id="result-total-sum" class="bg-gray-100 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result-total-label" class="font-medium text-sm text-gray-800">Gesamtmenge:</span>
+                    <span id="resultTotal" class="text-sm font-bold text-gray-900"></span>
+                </div>
+                <div id="result-total-product" class="hidden bg-purple-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span class="font-medium text-sm text-purple-800">Auflösung:</span>
+                    <span id="resultProduct" class="text-sm font-bold text-purple-900"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Referenzen auf DOM-Elemente ---
+        const ratio1Input = document.getElementById('ratio1');
+        const ratio2Input = document.getElementById('ratio2');
+        const percentValueInput = document.getElementById('percent-value');
+        const unitInput = document.getElementById('unit');
+        const unitSingleInput = document.getElementById('unit-single');
+        
+        const totalAmountInput = document.getElementById('totalAmount');
+        const amount1Input = document.getElementById('amount1');
+        const amount2Input = document.getElementById('amount2');
+
+        const result1Span = document.getElementById('result1');
+        const result2Span = document.getElementById('result2');
+        const resultTotalSpan = document.getElementById('resultTotal');
+        const resultProductSpan = document.getElementById('resultProduct');
+        const resultsContainer = document.getElementById('results-container');
+        const resultTotalSumDiv = document.getElementById('result-total-sum');
+        const resultTotalProductDiv = document.getElementById('result-total-product');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        const tabTotalBtn = document.getElementById('tab-total');
+        const tabSingleBtn = document.getElementById('tab-single');
+        const panelTotal = document.getElementById('panel-total');
+        const panelSingle = document.getElementById('panel-single');
+        
+        const ratioModeRatioBtn = document.getElementById('ratio-mode-ratio-btn');
+        const ratioModePercentBtn = document.getElementById('ratio-mode-percent-btn');
+        const ratioInputsDiv = document.getElementById('ratio-inputs');
+        const percentInputsDiv = document.getElementById('percent-inputs');
+
+        // Labels für dynamischen Text
+        const labelTotalAmount = document.getElementById('label-totalAmount');
+        const labelAmount1 = document.getElementById('label-amount1');
+        const labelAmount2 = document.getElementById('label-amount2');
+        const result1Label = document.getElementById('result1-label');
+        const result2Label = document.getElementById('result2-label');
+        const resultTotalLabel = document.getElementById('result-total-label');
+
+        let calculationMode = 'total'; // 'total' oder 'single'
+        let ratioMode = 'ratio'; // 'ratio' oder 'percent'
+
+        // --- UI-Zustandsfunktionen ---
+        function showError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+        }
+
+        function hideError() {
+            errorMessageDiv.classList.add('hidden');
+        }
+        
+        function clearAll() {
+            hideError();
+            resultsContainer.classList.add('hidden');
+            totalAmountInput.value = '';
+            amount1Input.value = '';
+            amount2Input.value = '';
+            result1Span.textContent = '';
+            result2Span.textContent = '';
+            resultTotalSpan.textContent = '';
+        }
+
+        function switchTab(mode) {
+            calculationMode = mode;
+            clearAll();
+            if (mode === 'total') {
+                tabTotalBtn.classList.add('active');
+                tabSingleBtn.classList.remove('active');
+                panelTotal.classList.remove('hidden');
+                panelSingle.classList.add('hidden');
+            } else {
+                tabSingleBtn.classList.add('active');
+                tabTotalBtn.classList.remove('active');
+                panelSingle.classList.remove('hidden');
+                panelTotal.classList.add('hidden');
+            }
+            calculateAndDisplay();
+        }
+        
+        function switchRatioMode(mode) {
+            ratioMode = mode;
+            // Die Werte werden jetzt nicht mehr gelöscht, nur die Ansicht gewechselt.
+            // clearAll(); // Diese Zeile wurde entfernt.
+            if (mode === 'ratio') {
+                ratioModeRatioBtn.classList.add('active');
+                ratioModePercentBtn.classList.remove('active');
+                ratioInputsDiv.classList.remove('hidden');
+                percentInputsDiv.classList.add('hidden');
+            } else {
+                ratioModePercentBtn.classList.add('active');
+                ratioModeRatioBtn.classList.remove('active');
+                percentInputsDiv.classList.remove('hidden');
+                ratioInputsDiv.classList.add('hidden');
+            }
+            calculateAndTop();
+        }
+
+        // --- Hauptberechnungslogik ---
+        function calculateAndDisplay() {
+            hideError();
+            let ratio1, ratio2;
+
+            if (ratioMode === 'ratio') {
+                ratio1 = parseFloat(ratio1Input.value);
+                ratio2 = parseFloat(ratio2Input.value);
+            } else { // ratioMode === 'percent'
+                const percentValue = parseFloat(percentValueInput.value);
+                if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
+                    showError('Bitte einen gültigen Prozentwert zwischen 0 und 100 eingeben.');
+                    return;
+                }
+                ratio1 = percentValue;
+                ratio2 = 100 - percentValue;
+            }
+
+            const unit = (calculationMode === 'total') 
+                ? unitInput.value.trim() 
+                : unitSingleInput.value.trim();
+
+            // --- Dynamische Label-Aktualisierung ---
+            const lengthUnits = ['mm', 'cm', 'dm', 'm', 'km'];
+            if (lengthUnits.includes(unit.toLowerCase())) {
+                labelTotalAmount.textContent = 'Gesamtlänge';
+                labelAmount1.textContent = 'Länge Teil 1';
+                labelAmount2.textContent = 'Länge Teil 2';
+                result1Label.textContent = "Länge Teil 1:";
+                result2Label.textContent = "Länge Teil 2:";
+                resultTotalLabel.textContent = "Gesamtlänge:";
+            } else {
+                labelTotalAmount.textContent = 'Gesamtmenge';
+                labelAmount1.textContent = 'Menge Teil 1';
+                labelAmount2.textContent = 'Menge Teil 2';
+                result1Label.textContent = "Menge Teil 1:";
+                result2Label.textContent = "Menge Teil 2:";
+                resultTotalLabel.textContent = "Gesamtmenge:";
+            }
+
+            // Verhältnis-Zahlen validieren
+            if (isNaN(ratio1) || isNaN(ratio2) || ratio1 < 0 || ratio2 < 0) {
+                if ((ratioMode === 'ratio' && (ratio1Input.value !== '' || ratio2Input.value !== '')) || (ratioMode === 'percent' && percentValueInput.value !== '')) {
+                    showError('Bitte gültige, nicht-negative Verhältniszahlen eingeben.');
+                } else {
+                    resultsContainer.classList.add('hidden');
+                }
+                return;
+            }
+            if (ratio1 + ratio2 === 0) {
+                 showError('Die Summe der Verhältnisteile darf nicht Null sein.');
+                 return;
+            }
+
+            let amount1, amount2, totalAmount;
+            let showResults = false;
+
+            if (calculationMode === 'total') {
+                totalAmount = parseFloat(totalAmountInput.value);
+                if (!isNaN(totalAmount) && totalAmount >= 0) {
+                    const totalRatio = ratio1 + ratio2;
+                    amount1 = (ratio1 / totalRatio) * totalAmount;
+                    amount2 = (ratio2 / totalRatio) * totalAmount;
+                    showResults = true;
+                }
+            } else { // calculationMode === 'single'
+                const inputAmount1 = parseFloat(amount1Input.value);
+                const inputAmount2 = parseFloat(amount2Input.value);
+
+                if (!isNaN(inputAmount1) && inputAmount1 >= 0) {
+                    if (ratio1 === 0) {
+                        showError('Kann nicht aus Teil 1 berechnen, wenn sein Anteil 0 ist.');
+                        return;
+                    }
+                    amount1 = inputAmount1;
+                    amount2 = (amount1 / ratio1) * ratio2;
+                    totalAmount = amount1 + amount2;
+                    showResults = true;
+                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) {
+                     if (ratio2 === 0) {
+                        showError('Kann nicht aus Teil 2 berechnen, wenn sein Anteil 0 ist.');
+                        return;
+                    }
+                    amount2 = inputAmount2;
+                    amount1 = (amount2 / ratio2) * ratio1;
+                    totalAmount = amount1 + amount2;
+                    showResults = true;
+                }
+            }
+            
+            if (showResults) {
+                const formatOutput = (value, currentUnit) => {
+                    const unitLower = currentUnit.toLowerCase();
+
+                    // Behandle Pixel als Sonderfall zuerst
+                    if (unitLower === 'pixel') {
+                        const displayValue = Math.round(value);
+                        return `${displayValue.toLocaleString('de-DE')} ${currentUnit}`;
+                    }
+
+                    const weightConversion = { 'g': 1, 'kg': 1000 };
+                    const volumeConversion = { 'ml': 1, 'l': 1000 };
+                    const lengthConversion = { 'mm': 1, 'cm': 10, 'dm': 100, 'm': 1000, 'km': 1000000 };
+
+                    let conversionMap, unitsOrdered;
+
+                    if (weightConversion[unitLower]) {
+                        conversionMap = weightConversion;
+                        unitsOrdered = [{ unit: 'kg', val: 1000 }, { unit: 'g', val: 1 }];
+                    } else if (volumeConversion[unitLower]) {
+                        conversionMap = volumeConversion;
+                        unitsOrdered = [{ unit: 'l', val: 1000 }, { unit: 'ml', val: 1 }];
+                    } else if (lengthConversion[unitLower]) {
+                        conversionMap = lengthConversion;
+                        unitsOrdered = [
+                            { unit: 'km', val: 1000000 }, { unit: 'm', val: 1000 },
+                            { unit: 'dm', val: 100 }, { unit: 'cm', val: 10 }, { unit: 'mm', val: 1 }
+                        ];
+                    } else {
+                        return `${value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currentUnit}`; // Fallback
+                    }
+
+                    // 1. Eingabewert in die kleinste Basiseinheit seiner Art umrechnen
+                    const valueInBaseUnit = value * conversionMap[unitLower];
+
+                    if (valueInBaseUnit === 0) {
+                        return `0,00 ${unitsOrdered[unitsOrdered.length - 1].unit}`;
+                    }
+                    
+                    // 2. Die am besten geeignete Einheit für den Wert finden
+                    let bestValue = valueInBaseUnit;
+                    let bestUnit = unitsOrdered[unitsOrdered.length - 1].unit; // Standard ist die kleinste
+
+                    for (const unitInfo of unitsOrdered) {
+                        if (valueInBaseUnit >= unitInfo.val) {
+                            bestValue = valueInBaseUnit / unitInfo.val;
+                            bestUnit = unitInfo.unit;
+                            break; // Beste Einheit gefunden
+                        }
+                    }
+                    
+                    // 3. Die endgültige Zahl zur Anzeige formatieren
+                    const formattingOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+                    return `${bestValue.toLocaleString('de-DE', formattingOptions)} ${bestUnit}`;
+                };
+
+                result1Span.textContent = formatOutput(amount1, unit);
+                result2Span.textContent = formatOutput(amount2, unit);
+
+                const unitsToHideTotal = ['mm', 'cm', 'dm', 'm'];
+                
+                resultTotalSumDiv.classList.add('hidden');
+                resultTotalProductDiv.classList.add('hidden');
+
+                if (unit.toLowerCase() === 'pixel') {
+                    const finalAmount1 = Math.round(amount1);
+                    const finalAmount2 = Math.round(amount2);
+                    const totalPixels = finalAmount1 * finalAmount2;
+                    const megaPixels = totalPixels / 1000000;
+                    
+                    const megaPixelString = megaPixels.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    
+                    resultProductSpan.innerHTML = `${megaPixelString} MP`;
+                    resultTotalProductDiv.classList.remove('hidden');
+                } else if (!unitsToHideTotal.includes(unit.toLowerCase())) {
+                    resultTotalSpan.textContent = formatOutput(totalAmount, unit);
+                    resultTotalSumDiv.classList.remove('hidden');
+                }
+                
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
+        }
+
+        // --- Event-Listener ---
+        // Tab-Umschaltung für Gesamt-/Einzelmenge
+        tabTotalBtn.addEventListener('click', () => switchTab('total'));
+        tabSingleBtn.addEventListener('click', () => switchTab('single'));
+        
+        // Tab-Umschaltung für Verhältnis-/Prozentmodus
+        ratioModeRatioBtn.addEventListener('click', () => switchRatioMode('ratio'));
+        ratioModePercentBtn.addEventListener('click', () => switchRatioMode('percent'));
+
+        // Neuberechnung bei jeder relevanten Eingabe
+        [ratio1Input, ratio2Input, percentValueInput, totalAmountInput, amount1Input, amount2Input].forEach(input => {
+            input.addEventListener('input', calculateAndDisplay);
+        });
+        [unitInput, unitSingleInput].forEach(select => {
+            select.addEventListener('change', calculateAndDisplay);
+        });
+
+        // Einheitenfelder synchronisieren
+        unitInput.addEventListener('change', () => {
+            unitSingleInput.value = unitInput.value;
+        });
+        unitSingleInput.addEventListener('change', () => {
+            unitInput.value = unitSingleInput.value;
+        });
+
+        // Spezielle Behandlung für Einzeleingaben, um die jeweils andere zu löschen
+        amount1Input.addEventListener('input', () => {
+            if (amount1Input.value !== '') {
+                amount2Input.value = '';
+            }
+            calculateAndDisplay();
+        });
+        amount2Input.addEventListener('input', () => {
+            if (amount2Input.value !== '') {
+                amount1Input.value = '';
+            }
+            calculateAndDisplay();
+        });
+
+        // Anfangszustand beim Laden der Seite einrichten
+        window.addEventListener('load', () => switchRatioMode('ratio'));
+    </script>
+</body>
+</html>

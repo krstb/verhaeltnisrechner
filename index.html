@@ -29,7 +29,12 @@
     <style>
 
 /* Fix für PWA-Ränder */
-    html {background-color: #000000 !important;}
+html, body { 
+    background-color: #3289D1 !important; 
+    overscroll-behavior: none; /* Verhindert das Wackeln/Bounce */
+    height: 100%;
+    overflow: hidden; /* Verhindert das Scrollen der gesamten Seite */
+}
         
         /* Als Standardschriftart Inter verwenden */
         body {
@@ -512,6 +517,7 @@
 </body>
 
 </html>
+
 
 
 

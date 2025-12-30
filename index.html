@@ -63,7 +63,7 @@
         
         <div class="text-center mb-3">
             <h1 class="text-xl font-bold text-gray-800">Verhältnis-Rechner</h1>
-            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und mehr.</p>
+            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und Pixel</p>
         </div>
         
         <div class="mb-3">
@@ -304,7 +304,7 @@
             const unit = (calculationMode === 'total') ? unitInput.value.trim() : unitSingleInput.value.trim();
             const lengthUnits = ['mm', 'cm', 'dm', 'm', 'km'];
             if (lengthUnits.includes(unit.toLowerCase())) {
-                labelTotalAmount.textContent = 'länge';
+                labelTotalAmount.textContent = 'Länge';
                 labelAmount1.textContent = 'Länge Teil 1';
                 labelAmount2.textContent = 'Länge Teil 2';
                 result1Label.textContent = "Länge Teil 1:";
@@ -439,3 +439,4 @@
     </script>
 </body>
 </html>
+

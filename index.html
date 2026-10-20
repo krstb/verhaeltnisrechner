@@ -406,7 +406,7 @@
                 };
                 result1Span.textContent = formatOutput(amount1, unit);
                 result2Span.textContent = formatOutput(amount2, unit);
-                const unitsToHideTotal = ['mm', 'cm', 'dm', 'm'];
+                const unitsToHideTotal = ['mm', 'cm', 'dm', 'm', 'km'];
                 resultTotalSumDiv.classList.add('hidden');
                 resultTotalProductDiv.classList.add('hidden');
                 if (unit.toLowerCase() === 'pixel') {
@@ -444,17 +444,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

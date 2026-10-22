@@ -28,34 +28,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-
         /* Fix für PWA-Ränder und den blauen Balken */
-        html {background-color: #000000 !important;
-              overscroll-behavior-y: none;
+        html {
+            background-color: #000000 !important;
+            overscroll-behavior-y: none;
         }
-        
         body { 
             background-color: #3289D1 !important; 
             font-family: 'Inter', sans-serif;
-        }
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
         }
         
         /* Segmented Control Styling */
         .segmented-control button {
             transition: all 0.2s ease-in-out;
-            background-color: #ffffff; /* Weißer Hintergrund für inaktive Buttons */
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Leichter Schatten zur Abhebung */
+            background-color: #ffffff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         
         .segmented-control button.active {
-            background-color: #3B82F6 !important; /* Blau für aktiv */
+            background-color: #3B82F6 !important;
             color: white !important;
             font-weight: 600;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -93,12 +84,12 @@
                     Verhältnis / Maßstab
                 </label>
                 <div id="ratio-inputs" class="flex items-center space-x-2">
-                    <input type="number" id="ratio1" placeholder="Teile 1" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="1" min="0">
+                    <input type="text" inputmode="decimal" id="ratio1" placeholder="Teile 1" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="1">
                     <span class="text-lg font-bold text-gray-400">:</span>
-                    <input type="number" id="ratio2" placeholder="Teile 2" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="2" min="0">
+                    <input type="text" inputmode="decimal" id="ratio2" placeholder="Teile 2" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="2">
                 </div>
                 <div id="percent-inputs" class="hidden">
-                    <input type="number" id="percent-value" placeholder="Anteil 1 in %" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="50" min="0" max="100">
+                    <input type="text" inputmode="decimal" id="percent-value" placeholder="Anteil 1 in %" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="50">
                 </div>
             </div>
 
@@ -118,7 +109,7 @@
                             <label id="label-totalAmount" for="totalAmount" class="block text-sm font-medium text-gray-700 mb-1">
                                 Gesamtmenge
                             </label>
-                            <input type="number" id="totalAmount" placeholder="z.B. 1000" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                            <input type="text" inputmode="decimal" id="totalAmount" placeholder="z.B. 1000" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
                         <div>
                             <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">
@@ -146,13 +137,13 @@
                             <label id="label-amount1" for="amount1" class="block text-sm font-medium text-gray-700 mb-1">
                                 Menge Teil 1
                             </label>
-                            <input type="number" id="amount1" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                            <input type="text" inputmode="decimal" id="amount1" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
                         <div>
                             <label id="label-amount2" for="amount2" class="block text-sm font-medium text-gray-700 mb-1">
                                 Menge Teil 2
                             </label>
-                            <input type="number" id="amount2" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" min="0">
+                            <input type="text" inputmode="decimal" id="amount2" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
                         <div>
                             <label for="unit-single" class="block text-sm font-medium text-gray-700 mb-1">
@@ -202,7 +193,7 @@
     </div>
 
     <script>
-        // Logik wie gewünscht absolut unverändert
+        // DOM-Elemente
         const ratio1Input = document.getElementById('ratio1');
         const ratio2Input = document.getElementById('ratio2');
         const percentValueInput = document.getElementById('percent-value');
@@ -236,6 +227,51 @@
 
         let calculationMode = 'total'; 
         let ratioMode = 'ratio'; 
+
+        // Hilfsfunktionen für Punkt-zu-Komma und Formatierung
+        function parseGermanFloat(str) {
+            if (typeof str !== 'string' || str.trim() === '') return NaN;
+            return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+        }
+
+        function formatToGermanString(num, decimals) {
+            if (typeof num !== 'number' || isNaN(num)) return '';
+            return num.toFixed(decimals).replace('.', ',');
+        }
+
+        function handleInput(e) {
+            let cursorPosition = e.target.selectionStart;
+            let originalValue = e.target.value;
+            
+            // Punkte in Kommas umwandeln und ungültige Zeichen filtern
+            let normalizedValue = originalValue.replace(/\./g, ',');
+            let cleanValue = normalizedValue.replace(/[^0-9,]/g, '');
+            
+            // Maximal ein Komma zulassen
+            const parts = cleanValue.split(',');
+            if (parts.length > 2) {
+                cleanValue = parts[0] + ',' + parts.slice(1).join('');
+            }
+            
+            e.target.value = cleanValue;
+            
+            if (originalValue !== cleanValue) { 
+                cursorPosition = cursorPosition + (cleanValue.length - originalValue.length); 
+            }
+            try {
+                e.target.setSelectionRange(cursorPosition, cursorPosition);
+            } catch (err) {}
+            
+            calculateAndDisplay();
+        }
+
+        function formatInputOnBlur(event, decimals) {
+            const input = event.target;
+            const value = parseGermanFloat(input.value);
+            if (!isNaN(value)) {
+                input.value = formatToGermanString(value, decimals);
+            }
+        }
 
         function showError(message) {
             errorMessageDiv.textContent = message;
@@ -295,10 +331,10 @@
             hideError();
             let ratio1, ratio2;
             if (ratioMode === 'ratio') {
-                ratio1 = parseFloat(ratio1Input.value);
-                ratio2 = parseFloat(ratio2Input.value);
+                ratio1 = parseGermanFloat(ratio1Input.value);
+                ratio2 = parseGermanFloat(ratio2Input.value);
             } else {
-                const percentValue = parseFloat(percentValueInput.value);
+                const percentValue = parseGermanFloat(percentValueInput.value);
                 if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
                     showError('Bitte einen gültigen Prozentwert zwischen 0 und 100 eingeben.');
                     return;
@@ -306,6 +342,7 @@
                 ratio1 = percentValue;
                 ratio2 = 100 - percentValue;
             }
+
             const unit = (calculationMode === 'total') ? unitInput.value.trim() : unitSingleInput.value.trim();
             const lengthUnits = ['mm', 'cm', 'dm', 'm', 'km'];
             if (lengthUnits.includes(unit.toLowerCase())) {
@@ -314,7 +351,7 @@
                 labelAmount2.textContent = 'Länge Teil 2';
                 result1Label.textContent = "Länge Teil 1:";
                 result2Label.textContent = "Länge Teil 2:";
-                resultTotalLabel.textContent = "länge:";
+                resultTotalLabel.textContent = "Länge:";
             } else {
                 labelTotalAmount.textContent = 'Menge';
                 labelAmount1.textContent = 'Menge Teil 1';
@@ -323,6 +360,7 @@
                 result2Label.textContent = "Menge Teil 2:";
                 resultTotalLabel.textContent = "Gesamtmenge:";
             }
+
             if (isNaN(ratio1) || isNaN(ratio2) || ratio1 < 0 || ratio2 < 0) {
                 if ((ratioMode === 'ratio' && (ratio1Input.value !== '' || ratio2Input.value !== '')) || (ratioMode === 'percent' && percentValueInput.value !== '')) {
                     showError('Bitte gültige, nicht-negative Verhältniszahlen eingeben.');
@@ -331,14 +369,17 @@
                 }
                 return;
             }
-            if (ratio1 + ratio2 === 0) {
-                 showError('Die Summe der Verhältnisteile darf nicht Null sein.');
+
+            if (ratio1 + ratio2 === 0) { 
+                 showError('Die Summe der Verhältnisteile darf nicht Null sein.'); 
                  return;
             }
+
             let amount1, amount2, totalAmount;
             let showResults = false;
+
             if (calculationMode === 'total') {
-                totalAmount = parseFloat(totalAmountInput.value);
+                totalAmount = parseGermanFloat(totalAmountInput.value);
                 if (!isNaN(totalAmount) && totalAmount >= 0) {
                     const totalRatio = ratio1 + ratio2;
                     amount1 = (ratio1 / totalRatio) * totalAmount;
@@ -346,8 +387,8 @@
                     showResults = true;
                 }
             } else {
-                const inputAmount1 = parseFloat(amount1Input.value);
-                const inputAmount2 = parseFloat(amount2Input.value);
+                const inputAmount1 = parseGermanFloat(amount1Input.value);
+                const inputAmount2 = parseGermanFloat(amount2Input.value);
                 if (!isNaN(inputAmount1) && inputAmount1 >= 0) {
                     if (ratio1 === 0) {
                         showError('Kann nicht aus Teil 1 berechnen, wenn sein Anteil 0 ist.');
@@ -357,7 +398,7 @@
                     amount2 = (amount1 / ratio1) * ratio2;
                     totalAmount = amount1 + amount2;
                     showResults = true;
-                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) {
+                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) { 
                      if (ratio2 === 0) {
                         showError('Kann nicht aus Teil 2 berechnen, wenn sein Anteil 0 ist.');
                         return;
@@ -368,6 +409,7 @@
                     showResults = true;
                 }
             }
+
             if (showResults) {
                 const formatOutput = (value, currentUnit) => {
                     const unitLower = currentUnit.toLowerCase();
@@ -404,11 +446,14 @@
                     }
                     return `${bestValue.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${bestUnit}`;
                 };
+
                 result1Span.textContent = formatOutput(amount1, unit);
                 result2Span.textContent = formatOutput(amount2, unit);
+
                 const unitsToHideTotal = ['mm', 'cm', 'dm', 'm', 'km'];
                 resultTotalSumDiv.classList.add('hidden');
                 resultTotalProductDiv.classList.add('hidden');
+
                 if (unit.toLowerCase() === 'pixel') {
                     const finalAmount1 = Math.round(amount1);
                     const finalAmount2 = Math.round(amount2);
@@ -426,20 +471,36 @@
             }
         }
 
+        // Event-Listener hinzufügen
         tabTotalBtn.addEventListener('click', () => switchTab('total'));
         tabSingleBtn.addEventListener('click', () => switchTab('single'));
         ratioModeRatioBtn.addEventListener('click', () => switchRatioMode('ratio'));
         ratioModePercentBtn.addEventListener('click', () => switchRatioMode('percent'));
-        [ratio1Input, ratio2Input, percentValueInput, totalAmountInput, amount1Input, amount2Input].forEach(input => {
-            input.addEventListener('input', calculateAndDisplay);
+
+        const allInputs = [ratio1Input, ratio2Input, percentValueInput, totalAmountInput, amount1Input, amount2Input];
+        
+        allInputs.forEach(input => {
+            input.addEventListener('input', handleInput);
         });
+
+        // Formatierung bei Verlassen des Feldes (Blur)
+        ratio1Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
+        ratio2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
+        percentValueInput.addEventListener('blur', (e) => formatInputOnBlur(e, 1));
+        totalAmountInput.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+        amount1Input.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+        amount2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+
         [unitInput, unitSingleInput].forEach(select => {
             select.addEventListener('change', calculateAndDisplay);
         });
+
         unitInput.addEventListener('change', () => { unitSingleInput.value = unitInput.value; });
-        unitSingleInput.addEventListener('change', () => { unitInput.value = unitSingleInput.value; });
-        amount1Input.addEventListener('input', () => { if (amount1Input.value !== '') amount2Input.value = ''; calculateAndDisplay(); });
-        amount2Input.addEventListener('input', () => { if (amount2Input.value !== '') amount1Input.value = ''; calculateAndDisplay(); });
+        unitSingleInput.addEventListener('change', () => { unitInput.value = unitInput.value; });
+
+        amount1Input.addEventListener('beforeinput', () => { if (amount1Input.value !== '') amount2Input.value = ''; });
+        amount2Input.addEventListener('beforeinput', () => { if (amount2Input.value !== '') amount1Input.value = ''; });
+
         window.addEventListener('load', () => switchRatioMode('ratio'));
     </script>
 </body>

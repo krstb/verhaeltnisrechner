@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verdünnungsrechner</title>
+    <title>Verhältnisrechner</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png"> 
@@ -15,7 +15,6 @@
     <link rel="apple-touch-icon" href="icon-192.png">
 
     <script>
-      // Service Worker Registrierung
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('sw.js')
@@ -25,179 +24,211 @@
     </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
         /* Fix für PWA-Ränder und den blauen Balken */
-        html {background-color: #000000 !important;
-              overscroll-behavior-y: none;
+        html {
+            background-color: #000000 !important;
+            overscroll-behavior-y: none;
         }
-         
-        body {background-color: #3289D1;
+        body { 
+            background-color: #3289D1 !important; 
             font-family: 'Inter', sans-serif;
-                    }
-        .card {
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
         }
-        input, select {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.8rem 0.75rem;
+        
+        /* Segmented Control Styling */
+        .segmented-control button {
             transition: all 0.2s ease-in-out;
-            width: 100%;
-            background-color: #f8fafc;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
             background-color: #ffffff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .result-box {
-            background-color: #e0e7ff;
-            border-radius: 1rem;
-            padding: 1.25rem;
-            margin-top: 1.5rem;
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            color: #3b82f6;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 220px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 0.375rem;
-            padding: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -110px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.875rem;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
+        
+        .segmented-control button.active {
+            background-color: #3B82F6 !important;
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
     </style>
 </head>
-<body class="flex items-start justify-center min-h-screen p-4">
+<body class="text-white flex items-start justify-center min-h-screen p-4 pt-4">
 
-    <div class="w-full max-w-lg mx-auto">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-white">Verdünnungsrechner</h1>
-            <p class="text-white">Berechnet die Mengen von Verdünnungen</p>
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-5">
+        
+        <div class="text-center mb-3">
+            <h1 class="text-xl font-bold text-gray-800">Verhältnis-Rechner</h1>
+            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und Pixel</p>
+        </div>
+        
+        <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Art der Eingabe
+            </label>
+            <div class="grid grid-cols-2">
+                <div id="ratio-mode-selector" class="segmented-control col-span-2 flex w-full rounded-xl bg-gray-200 p-1.5 gap-2">
+                    <button id="ratio-mode-ratio-btn" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                        Verhältnis (1:n)
+                    </button>
+                    <button id="ratio-mode-percent-btn" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                        Prozent (%)
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
-            <!-- Ausgangslösung -->
-            <div class="card">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Ausgangslösung</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label for="substance-select" class="block text-sm font-medium text-gray-700 mb-1">Stoff</label>
-                        <select id="substance-select">
-                            <option value="default">Wählen Sie einen Stoff</option>
-                            <option value="aceton">Aceton</option>
-                            <option value="ethanol">Ethanol</option>
-                            <option value="glycerin">Glycerin</option>
-                            <option value="isopropanol">Isopropanol</option>
-                            <option value="methanol">Methanol</option>
-                            <option value="salzsaeure">Salzsäure</option>
-                            <option value="schwefelsaeure">Schwefelsäure</option>
-                            <option value="wasser">Wasser</option>
-                            <option value="other">Andere (manuelle Eingabe)</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-5 gap-4">
-                        <div class="col-span-2">
-                            <label for="initial-concentration" class="block text-sm font-medium text-gray-700 mb-1">Konzentration</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" id="initial-concentration" placeholder="z.B. 99" class="flex-grow">
-                                <span class="text-gray-500">%</span>
-                            </div>
-                        </div>
-                        <div class="col-span-3">
-                            <label for="initial-density" class="block text-sm font-medium text-gray-700 mb-1">Dichte
-                                <span class="tooltip">ⓘ
-                                    <span class="tooltiptext">Die Dichte wird für gängige Stoffe automatisch ausgefüllt.</span>
-                                </span>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Verhältnis / Maßstab
+                </label>
+                <div id="ratio-inputs" class="flex items-center space-x-2">
+                    <input type="text" inputmode="decimal" id="ratio1" placeholder="Teile 1" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="1">
+                    <span class="text-lg font-bold text-gray-400">:</span>
+                    <input type="text" inputmode="decimal" id="ratio2" placeholder="Teile 2" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="2">
+                </div>
+                <div id="percent-inputs" class="hidden">
+                    <input type="text" inputmode="decimal" id="percent-value" placeholder="Anteil 1 in %" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-center text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" value="50">
+                </div>
+            </div>
+
+            <div class="segmented-control flex w-full rounded-xl bg-gray-200 p-1.5 gap-2">
+                <button id="tab-total" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                    Gesamtmenge
+                </button>
+                <button id="tab-single" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                    Einzelmenge
+                </button>
+            </div>
+
+            <div id="tab-panels" class="space-y-3">
+                <div id="panel-total">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label id="label-totalAmount" for="totalAmount" class="block text-sm font-medium text-gray-700 mb-1">
+                                Gesamtmenge
                             </label>
-                            <div class="flex items-center space-x-2">
-                                <input type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" id="initial-density" placeholder="z.B. 0,786" class="flex-grow">
-                                <span class="text-gray-500 text-sm">g/ml</span>
-                            </div>
+                            <input type="text" inputmode="decimal" id="totalAmount" placeholder="z.B. 1000" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">
+                                Einheit
+                            </label>
+                            <select id="unit" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option selected>g</option>
+                                <option>kg</option>
+                                <option>ml</option>
+                                <option>l</option>
+                                <option>mm</option>
+                                <option>cm</option>
+                                <option>dm</option>
+                                <option>m</option>
+                                <option>km</option>
+                                <option>Pixel</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Ziellösung -->
-            <div class="card">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Ziellösung</h2>
-                <div class="space-y-4">
-                    <div class="grid grid-cols-5 gap-4">
-                        <div class="col-span-2">
-                            <label for="target-concentration" class="block text-sm font-medium text-gray-700 mb-1">Konzentration</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" id="target-concentration" placeholder="z.B. 70" class="flex-grow">
-                                <span class="text-gray-500">%</span>
-                            </div>
+                <div id="panel-single" class="hidden">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label id="label-amount1" for="amount1" class="block text-sm font-medium text-gray-700 mb-1">
+                                Menge Teil 1
+                            </label>
+                            <input type="text" inputmode="decimal" id="amount1" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
-                        <div class="col-span-3">
-                            <label for="final-volume" class="block text-sm font-medium text-gray-700 mb-1">Gesamtmenge</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="text" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" id="final-volume" placeholder="z.B. 500" class="flex-grow">
-                                <select id="final-volume-unit" class="w-auto">
-                                    <option value="ml" selected>ml</option>
-                                    <option value="l">l</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label id="label-amount2" for="amount2" class="block text-sm font-medium text-gray-700 mb-1">
+                                Menge Teil 2
+                            </label>
+                            <input type="text" inputmode="decimal" id="amount2" placeholder="Wert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label for="unit-single" class="block text-sm font-medium text-gray-700 mb-1">
+                                Einheit
+                            </label>
+                            <select id="unit-single" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option selected>g</option>
+                                <option>kg</option>
+                                <option>ml</option>
+                                <option>l</option>
+                                <option>mm</option>
+                                <option>cm</option>
+                                <option>dm</option>
+                                <option>m</option>
+                                <option>km</option>
+                                <option>Pixel</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Ergebnis -->
-        <div id="result-container" class="result-box hidden">
-            <h3 class="text-lg font-semibold mb-2 text-indigo-800">Ergebnis</h3>
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b border-indigo-200">
-                        <th class="text-left font-medium text-gray-600 py-2">Komponente</th>
-                        <th class="text-right font-medium text-gray-600 py-2">Menge</th>
-                    </tr>
-                </thead>
-                <tbody id="result-table-body" class="divide-y divide-indigo-100">
-                </tbody>
-            </table>
-            <p id="result-note" class="text-xs text-gray-600 mt-3"></p>
-        </div>
-
-        <div id="error-message" class="text-center text-red-600 mt-4 hidden p-3 bg-red-100 rounded-lg">
-            Bitte fülle alle Felder korrekt aus. Die Anfangskonzentration muss größer sein als die Zielkonzentration.
+        <div id="error-message" class="text-red-500 text-center text-sm mt-3 font-medium hidden"></div>
+        
+        <div id="results-container" class="mt-4 pt-4 border-t border-gray-200 hidden">
+            <h2 class="text-base font-semibold text-center text-gray-800 mb-3">Ergebnis</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <div class="bg-blue-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result1-label" class="font-medium text-sm text-blue-800">Menge Teil 1:</span>
+                    <span id="result1" class="text-sm font-bold text-blue-900"></span>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result2-label" class="font-medium text-sm text-green-800">Menge Teil 2:</span>
+                    <span id="result2" class="text-sm font-bold text-green-900"></span>
+                </div>
+                <div id="result-total-sum" class="bg-gray-100 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span id="result-total-label" class="font-medium text-sm text-gray-800">Menge:</span>
+                    <span id="resultTotal" class="text-sm font-bold text-gray-900"></span>
+                </div>
+                <div id="result-total-product" class="hidden bg-purple-50 p-3 rounded-lg flex items-center justify-center space-x-1">
+                    <span class="font-medium text-sm text-purple-800">Auflösung:</span>
+                    <span id="resultProduct" class="text-sm font-bold text-purple-900"></span>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const densities = {
-            "aceton": 0.791, "ethanol": 0.789, "glycerin": 1.261,
-            "isopropanol": 0.786, "methanol": 0.791, "salzsaeure": 1.18,
-            "schwefelsaeure": 1.84, "wasser": 1.0
-        };
+        // DOM-Elemente
+        const ratio1Input = document.getElementById('ratio1');
+        const ratio2Input = document.getElementById('ratio2');
+        const percentValueInput = document.getElementById('percent-value');
+        const unitInput = document.getElementById('unit');
+        const unitSingleInput = document.getElementById('unit-single');
+        const totalAmountInput = document.getElementById('totalAmount');
+        const amount1Input = document.getElementById('amount1');
+        const amount2Input = document.getElementById('amount2');
+        const result1Span = document.getElementById('result1');
+        const result2Span = document.getElementById('result2');
+        const resultTotalSpan = document.getElementById('resultTotal');
+        const resultProductSpan = document.getElementById('resultProduct');
+        const resultsContainer = document.getElementById('results-container');
+        const resultTotalSumDiv = document.getElementById('result-total-sum');
+        const resultTotalProductDiv = document.getElementById('result-total-product');
+        const errorMessageDiv = document.getElementById('error-message');
+        const tabTotalBtn = document.getElementById('tab-total');
+        const tabSingleBtn = document.getElementById('tab-single');
+        const panelTotal = document.getElementById('panel-total');
+        const panelSingle = document.getElementById('panel-single');
+        const ratioModeRatioBtn = document.getElementById('ratio-mode-ratio-btn');
+        const ratioModePercentBtn = document.getElementById('ratio-mode-percent-btn');
+        const ratioInputsDiv = document.getElementById('ratio-inputs');
+        const percentInputsDiv = document.getElementById('percent-inputs');
+        const labelTotalAmount = document.getElementById('label-totalAmount');
+        const labelAmount1 = document.getElementById('label-amount1');
+        const labelAmount2 = document.getElementById('label-amount2');
+        const result1Label = document.getElementById('result1-label');
+        const result2Label = document.getElementById('result2-label');
+        const resultTotalLabel = document.getElementById('result-total-label');
 
+        let calculationMode = 'total'; 
+        let ratioMode = 'ratio'; 
+
+        // Hilfsfunktionen für Punkt-zu-Komma und Formatierung
         function parseGermanFloat(str) {
             if (typeof str !== 'string' || str.trim() === '') return NaN;
             return parseFloat(str.replace(/\./g, '').replace(',', '.'));
@@ -205,78 +236,35 @@
 
         function formatToGermanString(num, decimals) {
             if (typeof num !== 'number' || isNaN(num)) return '';
-            return new Intl.NumberFormat('de-DE', {
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals
-            }).format(num);
+            return num.toFixed(decimals).replace('.', ',');
         }
 
         function handleInput(e) {
             let cursorPosition = e.target.selectionStart;
             let originalValue = e.target.value;
-
-            // 1. Punkte in Kommas umwandeln
+            
+            // Punkte in Kommas umwandeln und ungültige Zeichen filtern
             let normalizedValue = originalValue.replace(/\./g, ',');
-
-            // 2. Nur Ziffern und Kommas zulassen
             let cleanValue = normalizedValue.replace(/[^0-9,]/g, '');
-
-            // 3. Nur maximal ein Komma erlauben
+            
+            // Maximal ein Komma zulassen
             const parts = cleanValue.split(',');
             if (parts.length > 2) {
                 cleanValue = parts[0] + ',' + parts.slice(1).join('');
             }
-
+            
             e.target.value = cleanValue;
-
-            // 4. Cursor-Position anpassen
+            
             if (originalValue !== cleanValue) { 
                 cursorPosition = cursorPosition + (cleanValue.length - originalValue.length); 
             }
             try {
                 e.target.setSelectionRange(cursorPosition, cursorPosition);
-            } catch (err) {
-                // Ignorieren
-            }
-
-            calculateSolution();
-        }
-
-        function handleFocus(e) {
-            const rawValue = e.target.value.replace(/\./g, '');
-            if (rawValue) {
-                e.target.value = rawValue;
-            }
-        }
-
-        function autoFillDensityFromSelect() {
-            const substanceSelect = document.getElementById('substance-select');
-            const densityInput = document.getElementById('initial-density');
-            const selectedValue = substanceSelect.value;
+            } catch (err) {}
             
-            if (selectedValue in densities) {
-                densityInput.value = formatToGermanString(densities[selectedValue], 3);
-                densityInput.disabled = true;
-            } else if (selectedValue === 'other') {
-                densityInput.value = '';
-                densityInput.disabled = false;
-                densityInput.focus();
-            } else {
-                densityInput.value = '';
-                densityInput.disabled = false;
-            }
-            calculateSolution();
+            calculateAndDisplay();
         }
 
-        function formatVolume(volumeMl) {
-            if (isNaN(volumeMl)) return '...';
-            if (volumeMl >= 1000) {
-                return formatToGermanString(volumeMl / 1000, 2) + ' l';
-            } else {
-                return formatToGermanString(volumeMl, 2) + ' ml';
-            }
-        }
-        
         function formatInputOnBlur(event, decimals) {
             const input = event.target;
             const value = parseGermanFloat(input.value);
@@ -285,69 +273,235 @@
             }
         }
 
-        function calculateSolution() {
-            const initialConcentration = parseGermanFloat(document.getElementById('initial-concentration').value);
-            const initialDensity = parseGermanFloat(document.getElementById('initial-density').value);
-            const targetConcentration = parseGermanFloat(document.getElementById('target-concentration').value);
-            let finalValue = parseGermanFloat(document.getElementById('final-volume').value);
-            const finalUnit = document.getElementById('final-volume-unit').value;
+        function showError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+        }
 
-            if (finalUnit === 'l') {
-                finalValue *= 1000;
+        function hideError() {
+            errorMessageDiv.classList.add('hidden');
+        }
+        
+        function clearAll() {
+            hideError();
+            resultsContainer.classList.add('hidden');
+            totalAmountInput.value = '';
+            amount1Input.value = '';
+            amount2Input.value = '';
+            result1Span.textContent = '';
+            result2Span.textContent = '';
+            resultTotalSpan.textContent = '';
+        }
+
+        function switchTab(mode) {
+            calculationMode = mode;
+            clearAll();
+            if (mode === 'total') {
+                tabTotalBtn.classList.add('active');
+                tabSingleBtn.classList.remove('active');
+                panelTotal.classList.remove('hidden');
+                panelSingle.classList.add('hidden');
+            } else {
+                tabSingleBtn.classList.add('active');
+                tabTotalBtn.classList.remove('active');
+                panelSingle.classList.remove('hidden');
+                panelTotal.classList.add('hidden');
+            }
+            calculateAndDisplay();
+        }
+        
+        function switchRatioMode(mode) {
+            ratioMode = mode;
+            if (mode === 'ratio') {
+                ratioModeRatioBtn.classList.add('active');
+                ratioModePercentBtn.classList.remove('active');
+                ratioInputsDiv.classList.remove('hidden');
+                percentInputsDiv.classList.add('hidden');
+            } else {
+                ratioModePercentBtn.classList.add('active');
+                ratioModeRatioBtn.classList.remove('active');
+                percentInputsDiv.classList.remove('hidden');
+                ratioInputsDiv.classList.add('hidden');
+            }
+            calculateAndDisplay();
+        }
+
+        function calculateAndDisplay() {
+            hideError();
+            let ratio1, ratio2;
+            if (ratioMode === 'ratio') {
+                ratio1 = parseGermanFloat(ratio1Input.value);
+                ratio2 = parseGermanFloat(ratio2Input.value);
+            } else {
+                const percentValue = parseGermanFloat(percentValueInput.value);
+                if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
+                    showError('Bitte einen gültigen Prozentwert zwischen 0 und 100 eingeben.');
+                    return;
+                }
+                ratio1 = percentValue;
+                ratio2 = 100 - percentValue;
             }
 
-            const resultContainer = document.getElementById('result-container');
-            const resultTableBody = document.getElementById('result-table-body');
-            const resultNote = document.getElementById('result-note');
-            const errorMessage = document.getElementById('error-message');
-            const substanceSelect = document.getElementById('substance-select');
-            const substanceName = substanceSelect.value === 'default' || substanceSelect.value === 'other' ? 'Ausgangslösung' : substanceSelect.options[substanceSelect.selectedIndex].text;
+            const unit = (calculationMode === 'total') ? unitInput.value.trim() : unitSingleInput.value.trim();
+            const lengthUnits = ['mm', 'cm', 'dm', 'm', 'km'];
+            if (lengthUnits.includes(unit.toLowerCase())) {
+                labelTotalAmount.textContent = 'Länge';
+                labelAmount1.textContent = 'Länge Teil 1';
+                labelAmount2.textContent = 'Länge Teil 2';
+                result1Label.textContent = "Länge Teil 1:";
+                result2Label.textContent = "Länge Teil 2:";
+                resultTotalLabel.textContent = "Länge:";
+            } else {
+                labelTotalAmount.textContent = 'Menge';
+                labelAmount1.textContent = 'Menge Teil 1';
+                labelAmount2.textContent = 'Menge Teil 2';
+                result1Label.textContent = "Menge Teil 1:";
+                result2Label.textContent = "Menge Teil 2:";
+                resultTotalLabel.textContent = "Gesamtmenge:";
+            }
 
-            resultTableBody.innerHTML = '';
-            resultNote.innerHTML = '';
-            resultContainer.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-
-            if (isNaN(initialConcentration) || isNaN(initialDensity) || isNaN(targetConcentration) || isNaN(finalValue) || initialConcentration <= 0 || initialConcentration > 100 || targetConcentration < 0 || targetConcentration >= 100 || finalValue <= 0 || initialConcentration <= targetConcentration) {
-                if (!isNaN(initialConcentration) && !isNaN(targetConcentration) && initialConcentration > 0 && targetConcentration >= 0 && finalValue > 0) {
-                    errorMessage.classList.remove('hidden');
+            if (isNaN(ratio1) || isNaN(ratio2) || ratio1 < 0 || ratio2 < 0) {
+                if ((ratioMode === 'ratio' && (ratio1Input.value !== '' || ratio2Input.value !== '')) || (ratioMode === 'percent' && percentValueInput.value !== '')) {
+                    showError('Bitte gültige, nicht-negative Verhältniszahlen eingeben.');
+                } else {
+                    resultsContainer.classList.add('hidden');
                 }
                 return;
             }
 
-            const initialNeededVolume = (finalValue * targetConcentration) / initialConcentration;
-            const diluentNeededVolume = finalValue - initialNeededVolume;
-            const initialNeededMass = initialNeededVolume * initialDensity;
-            const diluentNeededMass = diluentNeededVolume * 1.0;
+            if (ratio1 + ratio2 === 0) { 
+                 showError('Die Summe der Verhältnisteile darf nicht Null sein.'); 
+                 return;
+            }
 
-            const formattedInitialVolume = formatVolume(initialNeededVolume);
-            const formattedDiluentVolume = formatVolume(diluentNeededVolume);
+            let amount1, amount2, totalAmount;
+            let showResults = false;
 
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td class="py-2">${substanceName}</td><td class="text-right font-semibold py-2">${formatToGermanString(initialNeededMass, 2)} g <span class="text-gray-500 font-normal">(${formattedInitialVolume})</span></td>`;
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td class="py-2">Wasser</td><td class="text-right font-semibold py-2">${formatToGermanString(diluentNeededMass, 2)} g <span class="text-gray-500 font-normal">(${formattedDiluentVolume})</span></td>`;
-            
-            resultTableBody.appendChild(row1);
-            resultTableBody.appendChild(row2);
-            
-            resultContainer.classList.remove('hidden');
+            if (calculationMode === 'total') {
+                totalAmount = parseGermanFloat(totalAmountInput.value);
+                if (!isNaN(totalAmount) && totalAmount >= 0) {
+                    const totalRatio = ratio1 + ratio2;
+                    amount1 = (ratio1 / totalRatio) * totalAmount;
+                    amount2 = (ratio2 / totalRatio) * totalAmount;
+                    showResults = true;
+                }
+            } else {
+                const inputAmount1 = parseGermanFloat(amount1Input.value);
+                const inputAmount2 = parseGermanFloat(amount2Input.value);
+                if (!isNaN(inputAmount1) && inputAmount1 >= 0) {
+                    if (ratio1 === 0) {
+                        showError('Kann nicht aus Teil 1 berechnen, wenn sein Anteil 0 ist.');
+                        return;
+                    }
+                    amount1 = inputAmount1;
+                    amount2 = (amount1 / ratio1) * ratio2;
+                    totalAmount = amount1 + amount2;
+                    showResults = true;
+                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) { 
+                     if (ratio2 === 0) {
+                        showError('Kann nicht aus Teil 2 berechnen, wenn sein Anteil 0 ist.');
+                        return;
+                    }
+                    amount2 = inputAmount2;
+                    amount1 = (amount2 / ratio2) * ratio1;
+                    totalAmount = amount1 + amount2;
+                    showResults = true;
+                }
+            }
+
+            if (showResults) {
+                const formatOutput = (value, currentUnit) => {
+                    const unitLower = currentUnit.toLowerCase();
+                    if (unitLower === 'pixel') {
+                        const displayValue = Math.round(value);
+                        return `${displayValue.toLocaleString('de-DE')} ${currentUnit}`;
+                    }
+                    const weightConversion = { 'g': 1, 'kg': 1000 };
+                    const volumeConversion = { 'ml': 1, 'l': 1000 };
+                    const lengthConversion = { 'mm': 1, 'cm': 10, 'dm': 100, 'm': 1000, 'km': 1000000 };
+                    let conversionMap, unitsOrdered;
+                    if (weightConversion[unitLower]) {
+                        conversionMap = weightConversion;
+                        unitsOrdered = [{ unit: 'kg', val: 1000 }, { unit: 'g', val: 1 }];
+                    } else if (volumeConversion[unitLower]) {
+                        conversionMap = volumeConversion;
+                        unitsOrdered = [{ unit: 'l', val: 1000 }, { unit: 'ml', val: 1 }];
+                    } else if (lengthConversion[unitLower]) {
+                        conversionMap = lengthConversion;
+                        unitsOrdered = [{ unit: 'km', val: 1000000 }, { unit: 'm', val: 1000 }, { unit: 'dm', val: 100 }, { unit: 'cm', val: 10 }, { unit: 'mm', val: 1 }];
+                    } else {
+                        return `${value.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currentUnit}`;
+                    }
+                    const valueInBaseUnit = value * conversionMap[unitLower];
+                    if (valueInBaseUnit === 0) return `0,00 ${unitsOrdered[unitsOrdered.length - 1].unit}`;
+                    let bestValue = valueInBaseUnit;
+                    let bestUnit = unitsOrdered[unitsOrdered.length - 1].unit;
+                    for (const unitInfo of unitsOrdered) {
+                        if (valueInBaseUnit >= unitInfo.val) {
+                            bestValue = valueInBaseUnit / unitInfo.val;
+                            bestUnit = unitInfo.unit;
+                            break;
+                        }
+                    }
+                    return `${bestValue.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${bestUnit}`;
+                };
+
+                result1Span.textContent = formatOutput(amount1, unit);
+                result2Span.textContent = formatOutput(amount2, unit);
+
+                const unitsToHideTotal = ['mm', 'cm', 'dm', 'm', 'km'];
+                resultTotalSumDiv.classList.add('hidden');
+                resultTotalProductDiv.classList.add('hidden');
+
+                if (unit.toLowerCase() === 'pixel') {
+                    const finalAmount1 = Math.round(amount1);
+                    const finalAmount2 = Math.round(amount2);
+                    const totalPixels = finalAmount1 * finalAmount2;
+                    const megaPixels = totalPixels / 1000000;
+                    resultProductSpan.innerHTML = `${megaPixels.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MP`;
+                    resultTotalProductDiv.classList.remove('hidden');
+                } else if (!unitsToHideTotal.includes(unit.toLowerCase())) {
+                    resultTotalSpan.textContent = formatOutput(totalAmount, unit);
+                    resultTotalSumDiv.classList.remove('hidden');
+                }
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
         }
 
-        const inputsToCalculate = ['initial-concentration', 'initial-density', 'target-concentration', 'final-volume'];
-        inputsToCalculate.forEach(id => {
-            const el = document.getElementById(id);
-            el.addEventListener('input', handleInput);
-            el.addEventListener('focus', handleFocus);
-        });
-        
-        document.getElementById('final-volume-unit').addEventListener('change', calculateSolution);
-        document.getElementById('substance-select').addEventListener('change', autoFillDensityFromSelect);
+        // Event-Listener hinzufügen
+        tabTotalBtn.addEventListener('click', () => switchTab('total'));
+        tabSingleBtn.addEventListener('click', () => switchTab('single'));
+        ratioModeRatioBtn.addEventListener('click', () => switchRatioMode('ratio'));
+        ratioModePercentBtn.addEventListener('click', () => switchRatioMode('percent'));
 
-        document.getElementById('initial-concentration').addEventListener('blur', (e) => formatInputOnBlur(e, 2));
-        document.getElementById('initial-density').addEventListener('blur', (e) => formatInputOnBlur(e, 3));
-        document.getElementById('target-concentration').addEventListener('blur', (e) => formatInputOnBlur(e, 2));
-        document.getElementById('final-volume').addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+        const allInputs = [ratio1Input, ratio2Input, percentValueInput, totalAmountInput, amount1Input, amount2Input];
+        
+        allInputs.forEach(input => {
+            input.addEventListener('input', handleInput);
+        });
+
+        // Formatierung bei Verlassen des Feldes (Blur)
+        ratio1Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
+        ratio2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
+        percentValueInput.addEventListener('blur', (e) => formatInputOnBlur(e, 1));
+        totalAmountInput.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+        amount1Input.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+        amount2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
+
+        [unitInput, unitSingleInput].forEach(select => {
+            select.addEventListener('change', calculateAndDisplay);
+        });
+
+        unitInput.addEventListener('change', () => { unitSingleInput.value = unitInput.value; });
+        unitSingleInput.addEventListener('change', () => { unitInput.value = unitInput.value; });
+
+        amount1Input.addEventListener('beforeinput', () => { if (amount1Input.value !== '') amount2Input.value = ''; });
+        amount2Input.addEventListener('beforeinput', () => { if (amount2Input.value !== '') amount1Input.value = ''; });
+
+        window.addEventListener('load', () => switchRatioMode('ratio'));
     </script>
 </body>
 </html>

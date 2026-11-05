@@ -65,8 +65,8 @@
 
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-5">
         <div class="text-center mb-3">
-            <h1 class="text-xl font-bold text-gray-800">Verhältnis-Rechner</h1>
-            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und Pixel</p>
+            <h1 class="text-xl font-bold text-gray-800">Verhältnisrechner</h1>
+            <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe,<br> Seitenverhältnisse und Pixel</p>
         </div>
 
         <div class="mb-3">
@@ -562,12 +562,21 @@
             saveState();
         });
 
-        amount1Input.addEventListener('beforeinput', () => { 
-            if (amount1Input.value !== '') amount2Input.value = ''; 
-        });
-        amount2Input.addEventListener('beforeinput', () => { 
-            if (amount2Input.value !== '') amount1Input.value = ''; 
-        });
+        amount1Input.addEventListener('input', () => {
+    if (amount1Input.value !== '') {
+        amount2Input.value = '';
+        saveState();
+        calculateAndDisplay();
+    }
+});
+
+amount2Input.addEventListener('input', () => {
+    if (amount2Input.value !== '') {
+        amount1Input.value = '';
+        saveState();
+        calculateAndDisplay();
+    }
+});
 
         loadState();
         calculateAndDisplay();

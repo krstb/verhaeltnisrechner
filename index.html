@@ -6,7 +6,7 @@
     <title>Verhältnisrechner</title>
 
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png"> 
+    <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="theme-color" content="#000000">
     <meta name="color-scheme" content="light">
@@ -15,39 +15,47 @@
     <link rel="apple-touch-icon" href="icon-192.png">
 
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .catch(err => console.log('SW Fehler:', err));
-        });
-      }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .catch(err => console.log('SW Fehler:', err));
+            });
+        }
     </script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=optional">
+
     <style>
         /* Fix für PWA-Ränder und den blauen Balken */
         html {
             background-color: #000000 !important;
             overscroll-behavior-y: none;
         }
-        body { 
-            background-color: #3289D1 !important; 
-            font-family: 'Inter', sans-serif;
+        body {
+            background-color: #3289D1 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-variant-numeric: tabular-nums;
         }
-        
+
+        input, span, select {
+            font-variant-numeric: tabular-nums;
+        }
+
         /* Segmented Control Styling */
         .segmented-control button {
-            transition: all 0.2s ease-in-out;
+            transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
             background-color: #ffffff;
+            color: #374151;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        
+
         .segmented-control button.active {
             background-color: #3B82F6 !important;
-            color: white !important;
+            color: #ffffff !important;
             font-weight: 600;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
@@ -56,22 +64,21 @@
 <body class="text-white flex items-start justify-center min-h-screen p-4 pt-4">
 
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-5">
-        
         <div class="text-center mb-3">
             <h1 class="text-xl font-bold text-gray-800">Verhältnis-Rechner</h1>
             <p class="text-gray-500 text-sm mt-1">Für Mischungen, Maßstäbe, Seitenverhältnisse und Pixel</p>
         </div>
-        
+
         <div class="mb-3">
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 Art der Eingabe
             </label>
             <div class="grid grid-cols-2">
                 <div id="ratio-mode-selector" class="segmented-control col-span-2 flex w-full rounded-xl bg-gray-200 p-1.5 gap-2">
-                    <button id="ratio-mode-ratio-btn" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                    <button type="button" id="ratio-mode-ratio-btn" class="flex-1 py-2 px-3 text-sm font-medium rounded-lg focus:outline-none">
                         Verhältnis (1:n)
                     </button>
-                    <button id="ratio-mode-percent-btn" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                    <button type="button" id="ratio-mode-percent-btn" class="flex-1 py-2 px-3 text-sm font-medium rounded-lg focus:outline-none">
                         Prozent (%)
                     </button>
                 </div>
@@ -94,10 +101,10 @@
             </div>
 
             <div class="segmented-control flex w-full rounded-xl bg-gray-200 p-1.5 gap-2">
-                <button id="tab-total" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none active">
+                <button type="button" id="tab-total" class="flex-1 py-2 px-3 text-sm font-medium rounded-lg focus:outline-none">
                     Gesamtmenge
                 </button>
-                <button id="tab-single" class="flex-1 py-2 px-3 text-sm font-medium text-gray-700 rounded-lg focus:outline-none">
+                <button type="button" id="tab-single" class="flex-1 py-2 px-3 text-sm font-medium rounded-lg focus:outline-none">
                     Einzelmenge
                 </button>
             </div>
@@ -168,25 +175,26 @@
         </div>
 
         <div id="error-message" class="text-red-500 text-center text-sm mt-3 font-medium hidden"></div>
-        
+
+        <!-- Ergebnis -->
         <div id="results-container" class="mt-4 pt-4 border-t border-gray-200 hidden">
-            <h2 class="text-base font-semibold text-center text-gray-800 mb-3">Ergebnis</h2>
-            <div class="grid grid-cols-1 gap-2">
-                <div class="bg-blue-50 p-3 rounded-lg flex items-center justify-center space-x-1">
-                    <span id="result1-label" class="font-medium text-sm text-blue-800">Menge Teil 1:</span>
-                    <span id="result1" class="text-sm font-bold text-blue-900"></span>
+            <h2 class="text-lg font-bold text-center text-gray-800 mb-3">Ergebnis</h2>
+            <div class="grid grid-cols-1 gap-2.5">
+                <div class="bg-blue-50 p-3.5 rounded-xl flex items-center justify-between px-4">
+                    <span id="result1-label" class="text-lg font-bold text-blue-900">Menge Teil 1:</span>
+                    <span id="result1" class="text-lg font-bold text-blue-950"></span>
                 </div>
-                <div class="bg-green-50 p-3 rounded-lg flex items-center justify-center space-x-1">
-                    <span id="result2-label" class="font-medium text-sm text-green-800">Menge Teil 2:</span>
-                    <span id="result2" class="text-sm font-bold text-green-900"></span>
+                <div class="bg-green-50 p-3.5 rounded-xl flex items-center justify-between px-4">
+                    <span id="result2-label" class="text-lg font-bold text-green-900">Menge Teil 2:</span>
+                    <span id="result2" class="text-lg font-bold text-green-950"></span>
                 </div>
-                <div id="result-total-sum" class="bg-gray-100 p-3 rounded-lg flex items-center justify-center space-x-1">
-                    <span id="result-total-label" class="font-medium text-sm text-gray-800">Menge:</span>
-                    <span id="resultTotal" class="text-sm font-bold text-gray-900"></span>
+                <div id="result-total-sum" class="bg-gray-100 p-3.5 rounded-xl flex items-center justify-between px-4">
+                    <span id="result-total-label" class="text-lg font-bold text-gray-900">Gesamtmenge:</span>
+                    <span id="resultTotal" class="text-lg font-bold text-gray-950"></span>
                 </div>
-                <div id="result-total-product" class="hidden bg-purple-50 p-3 rounded-lg flex items-center justify-center space-x-1">
-                    <span class="font-medium text-sm text-purple-800">Auflösung:</span>
-                    <span id="resultProduct" class="text-sm font-bold text-purple-900"></span>
+                <div id="result-total-product" class="hidden bg-purple-50 p-3.5 rounded-xl flex items-center justify-between px-4">
+                    <span class="text-lg font-bold text-purple-900">Auflösung:</span>
+                    <span id="resultProduct" class="text-lg font-bold text-purple-950"></span>
                 </div>
             </div>
         </div>
@@ -225,10 +233,84 @@
         const result2Label = document.getElementById('result2-label');
         const resultTotalLabel = document.getElementById('result-total-label');
 
-        let calculationMode = 'total'; 
-        let ratioMode = 'ratio'; 
+        let calculationMode = 'total';
+        let ratioMode = 'ratio';
 
-        // Hilfsfunktionen für Punkt-zu-Komma und Formatierung
+        function saveState() {
+            try {
+                const data = {
+                    ratioMode: ratioMode,
+                    calculationMode: calculationMode,
+                    ratio1: ratio1Input.value,
+                    ratio2: ratio2Input.value,
+                    percentValue: percentValueInput.value,
+                    totalAmount: totalAmountInput.value,
+                    amount1: amount1Input.value,
+                    amount2: amount2Input.value,
+                    unit: unitInput.value,
+                    unitSingle: unitSingleInput.value
+                };
+                localStorage.setItem('verhaeltnisrechner_data', JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function setRatioMode(mode) {
+            ratioMode = mode;
+            if (mode === 'ratio') {
+                ratioModeRatioBtn.classList.add('active');
+                ratioModePercentBtn.classList.remove('active');
+                ratioInputsDiv.classList.remove('hidden');
+                percentInputsDiv.classList.add('hidden');
+            } else {
+                ratioModePercentBtn.classList.add('active');
+                ratioModeRatioBtn.classList.remove('active');
+                percentInputsDiv.classList.remove('hidden');
+                ratioInputsDiv.classList.add('hidden');
+            }
+        }
+
+        function setCalculationTab(mode) {
+            calculationMode = mode;
+            if (mode === 'total') {
+                tabTotalBtn.classList.add('active');
+                tabSingleBtn.classList.remove('active');
+                panelTotal.classList.remove('hidden');
+                panelSingle.classList.add('hidden');
+            } else {
+                tabSingleBtn.classList.add('active');
+                tabTotalBtn.classList.remove('active');
+                panelSingle.classList.remove('hidden');
+                panelTotal.classList.add('hidden');
+            }
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('verhaeltnisrechner_data');
+                if (!saved) {
+                    setRatioMode('ratio');
+                    setCalculationTab('total');
+                    return;
+                }
+                const data = JSON.parse(saved);
+
+                if (data.ratio1 !== undefined) ratio1Input.value = data.ratio1;
+                if (data.ratio2 !== undefined) ratio2Input.value = data.ratio2;
+                if (data.percentValue !== undefined) percentValueInput.value = data.percentValue;
+                if (data.totalAmount !== undefined) totalAmountInput.value = data.totalAmount;
+                if (data.amount1 !== undefined) amount1Input.value = data.amount1;
+                if (data.amount2 !== undefined) amount2Input.value = data.amount2;
+                if (data.unit !== undefined) unitInput.value = data.unit;
+                if (data.unitSingle !== undefined) unitSingleInput.value = data.unitSingle;
+
+                setRatioMode(data.ratioMode === 'percent' ? 'percent' : 'ratio');
+                setCalculationTab(data.calculationMode === 'single' ? 'single' : 'total');
+            } catch (e) {
+                setRatioMode('ratio');
+                setCalculationTab('total');
+            }
+        }
+
         function parseGermanFloat(str) {
             if (typeof str !== 'string' || str.trim() === '') return NaN;
             return parseFloat(str.replace(/\./g, '').replace(',', '.'));
@@ -242,26 +324,25 @@
         function handleInput(e) {
             let cursorPosition = e.target.selectionStart;
             let originalValue = e.target.value;
-            
-            // Punkte in Kommas umwandeln und ungültige Zeichen filtern
+
             let normalizedValue = originalValue.replace(/\./g, ',');
             let cleanValue = normalizedValue.replace(/[^0-9,]/g, '');
-            
-            // Maximal ein Komma zulassen
+
             const parts = cleanValue.split(',');
             if (parts.length > 2) {
                 cleanValue = parts[0] + ',' + parts.slice(1).join('');
             }
-            
+
             e.target.value = cleanValue;
-            
-            if (originalValue !== cleanValue) { 
-                cursorPosition = cursorPosition + (cleanValue.length - originalValue.length); 
+
+            if (originalValue !== cleanValue) {
+                cursorPosition = cursorPosition + (cleanValue.length - originalValue.length);
             }
             try {
                 e.target.setSelectionRange(cursorPosition, cursorPosition);
             } catch (err) {}
-            
+
+            saveState();
             calculateAndDisplay();
         }
 
@@ -271,6 +352,7 @@
             if (!isNaN(value)) {
                 input.value = formatToGermanString(value, decimals);
             }
+            saveState();
         }
 
         function showError(message) {
@@ -281,50 +363,6 @@
 
         function hideError() {
             errorMessageDiv.classList.add('hidden');
-        }
-        
-        function clearAll() {
-            hideError();
-            resultsContainer.classList.add('hidden');
-            totalAmountInput.value = '';
-            amount1Input.value = '';
-            amount2Input.value = '';
-            result1Span.textContent = '';
-            result2Span.textContent = '';
-            resultTotalSpan.textContent = '';
-        }
-
-        function switchTab(mode) {
-            calculationMode = mode;
-            clearAll();
-            if (mode === 'total') {
-                tabTotalBtn.classList.add('active');
-                tabSingleBtn.classList.remove('active');
-                panelTotal.classList.remove('hidden');
-                panelSingle.classList.add('hidden');
-            } else {
-                tabSingleBtn.classList.add('active');
-                tabTotalBtn.classList.remove('active');
-                panelSingle.classList.remove('hidden');
-                panelTotal.classList.add('hidden');
-            }
-            calculateAndDisplay();
-        }
-        
-        function switchRatioMode(mode) {
-            ratioMode = mode;
-            if (mode === 'ratio') {
-                ratioModeRatioBtn.classList.add('active');
-                ratioModePercentBtn.classList.remove('active');
-                ratioInputsDiv.classList.remove('hidden');
-                percentInputsDiv.classList.add('hidden');
-            } else {
-                ratioModePercentBtn.classList.add('active');
-                ratioModeRatioBtn.classList.remove('active');
-                percentInputsDiv.classList.remove('hidden');
-                ratioInputsDiv.classList.add('hidden');
-            }
-            calculateAndDisplay();
         }
 
         function calculateAndDisplay() {
@@ -370,9 +408,9 @@
                 return;
             }
 
-            if (ratio1 + ratio2 === 0) { 
-                 showError('Die Summe der Verhältnisteile darf nicht Null sein.'); 
-                 return;
+            if (ratio1 + ratio2 === 0) {
+                showError('Die Summe der Verhältnisteile darf nicht Null sein.');
+                return;
             }
 
             let amount1, amount2, totalAmount;
@@ -398,8 +436,8 @@
                     amount2 = (amount1 / ratio1) * ratio2;
                     totalAmount = amount1 + amount2;
                     showResults = true;
-                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) { 
-                     if (ratio2 === 0) {
+                } else if (!isNaN(inputAmount2) && inputAmount2 >= 0) {
+                    if (ratio2 === 0) {
                         showError('Kann nicht aus Teil 2 berechnen, wenn sein Anteil 0 ist.');
                         return;
                     }
@@ -471,19 +509,36 @@
             }
         }
 
-        // Event-Listener hinzufügen
-        tabTotalBtn.addEventListener('click', () => switchTab('total'));
-        tabSingleBtn.addEventListener('click', () => switchTab('single'));
-        ratioModeRatioBtn.addEventListener('click', () => switchRatioMode('ratio'));
-        ratioModePercentBtn.addEventListener('click', () => switchRatioMode('percent'));
+        // Event-Listener
+        tabTotalBtn.addEventListener('click', () => {
+            setCalculationTab('total');
+            saveState();
+            calculateAndDisplay();
+        });
+
+        tabSingleBtn.addEventListener('click', () => {
+            setCalculationTab('single');
+            saveState();
+            calculateAndDisplay();
+        });
+
+        ratioModeRatioBtn.addEventListener('click', () => {
+            setRatioMode('ratio');
+            saveState();
+            calculateAndDisplay();
+        });
+
+        ratioModePercentBtn.addEventListener('click', () => {
+            setRatioMode('percent');
+            saveState();
+            calculateAndDisplay();
+        });
 
         const allInputs = [ratio1Input, ratio2Input, percentValueInput, totalAmountInput, amount1Input, amount2Input];
-        
         allInputs.forEach(input => {
             input.addEventListener('input', handleInput);
         });
 
-        // Formatierung bei Verlassen des Feldes (Blur)
         ratio1Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
         ratio2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 0));
         percentValueInput.addEventListener('blur', (e) => formatInputOnBlur(e, 1));
@@ -492,16 +547,30 @@
         amount2Input.addEventListener('blur', (e) => formatInputOnBlur(e, 2));
 
         [unitInput, unitSingleInput].forEach(select => {
-            select.addEventListener('change', calculateAndDisplay);
+            select.addEventListener('change', () => {
+                saveState();
+                calculateAndDisplay();
+            });
         });
 
-        unitInput.addEventListener('change', () => { unitSingleInput.value = unitInput.value; });
-        unitSingleInput.addEventListener('change', () => { unitInput.value = unitInput.value; });
+        unitInput.addEventListener('change', () => { 
+            unitSingleInput.value = unitInput.value; 
+            saveState();
+        });
+        unitSingleInput.addEventListener('change', () => { 
+            unitInput.value = unitSingleInput.value; 
+            saveState();
+        });
 
-        amount1Input.addEventListener('beforeinput', () => { if (amount1Input.value !== '') amount2Input.value = ''; });
-        amount2Input.addEventListener('beforeinput', () => { if (amount2Input.value !== '') amount1Input.value = ''; });
+        amount1Input.addEventListener('beforeinput', () => { 
+            if (amount1Input.value !== '') amount2Input.value = ''; 
+        });
+        amount2Input.addEventListener('beforeinput', () => { 
+            if (amount2Input.value !== '') amount1Input.value = ''; 
+        });
 
-        window.addEventListener('load', () => switchRatioMode('ratio'));
+        loadState();
+        calculateAndDisplay();
     </script>
 </body>
 </html>
